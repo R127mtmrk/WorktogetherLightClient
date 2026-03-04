@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmation de la commande{% endblock %}
+
+{% block body %}
+    <h1>Confirmation de la commande</h1>
+
+    <div id="loading" style="border:1px solid #ccc;padding:1rem;margin-bottom:1rem;">
+        <p>Préparation de la transaction...</p>
+        <p>Offre : {{ offer ? offer.id : '-' }}</p>
+        <p>Quantité : {{ quantity }}</p>
+        <p>Unités disponibles : <strong>{{ available }}</strong></p>
+        <p>Total : {{ total }} €</p>
+    </div>
+
+    <form method="post" action="{{ path('app_order_submit') }}">
+        <input type="hidden" name="offer" value="{{ offer ? offer.id : '' }}" />
+        <input type="hidden" name="quantity" value="{{ quantity }}" />
+        <input type="hidden" name="unitPrice" value="{{ unitPrice }}" />
+        <input type="hidden" name="annualPayment" value="{{ annualPayment ? 1 : 0 }}" />
+        <input type="hidden" name="discountPercent" value="{{ discountPercent }}" />
+        <input type="hidden" name="total" value="{{ total }}" />
+        <input type="hidden" name="createdAt" value="{{ createdAt }}" />
+        <input type="hidden" name="simulate" value="{{ simulate ? 1 : 0 }}" />
+
+        <button type="submit" id="confirm-btn">Confirmer la transaction</button>
+        <a href="{{ path('app_order_new') }}">Annuler</a>
+    </form>
+
+    {% if simulate and simulatedUnits is defined %}
+        <h2>Simulation - unités proposées</h2>
+        <ul>
+            {% for id in simulatedUnits %}
+                <li>Unit #{{ id }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <script>
+        // petit effet loading avant d'activer le bouton
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('confirm-btn');
+            btn.disabled = true;
+            setTimeout(() => btn.disabled = false, 1500); // 1.5s de "préparation"
+        });
+    </script>
+
+{% endblock %}

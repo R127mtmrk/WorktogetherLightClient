@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon dashboard - Mes commandes{% endblock %}
+
+{% block body %}
+    <h1>Mes commandes</h1>
+
+    {% if orders is empty %}
+        <p>Vous n'avez aucune commande pour le moment.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Offre</th>
+                    <th>Quantité</th>
+                    <th>Prix unitaire</th>
+                    <th>Total</th>
+                    <th>Paiement annuel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.getCreatedAt ? order.getCreatedAt|date('d/m/Y H:i') : '-' }}</td>
+                        <td>{{ order.getOffer ? order.getOffer.getName() : '-' }}</td>
+                        <td>{{ order.getQuantity }}</td>
+                        <td>{{ order.getUnitPrice is not null ? (order.getUnitPrice|number_format(2, '.', ' ')) ~ ' €' : '-' }}</td>
+                        <td>{{ order.getTotal is not null ? (order.getTotal|number_format(2, '.', ' ')) ~ ' €' : '-' }}</td>
+                        <td>{{ order.isAnnualPayment ? 'Oui' : 'Non' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}

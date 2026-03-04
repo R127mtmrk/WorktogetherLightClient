@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+{% endblock %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="logo" aria-hidden="true"></span>
+      <h1>Créer un compte</h1>
+    </div>
+
+    {{ form_start(registrationForm) }}
+        <div class="form-row">
+            {{ form_label(registrationForm.pseudo) }}
+            {{ form_widget(registrationForm.pseudo) }}
+            {{ form_errors(registrationForm.pseudo) }}
+        </div>
+
+        <div class="form-row">
+            {{ form_label(registrationForm.email) }}
+            {{ form_widget(registrationForm.email) }}
+            {{ form_errors(registrationForm.email) }}
+        </div>
+
+        <div class="form-row">
+            {{ form_label(registrationForm.plainPassword) }}
+            {{ form_widget(registrationForm.plainPassword) }}
+            {{ form_errors(registrationForm.plainPassword) }}
+        </div>
+
+        <div class="form-row">
+            {{ form_widget(registrationForm.agreeTerms) }}
+            {{ form_label(registrationForm.agreeTerms) }}
+            {{ form_errors(registrationForm.agreeTerms) }}
+        </div>
+
+        <div class="form-actions">
+            <button class="btn" type="submit">S'inscrire</button>
+            <a class="btn-outline" href="{{ path('app_login') }}">Déjà inscrit ? Se connecter</a>
+        </div>
+
+    {{ form_end(registrationForm) }}
+
+    <div class="footer-note">En vous inscrivant, vous acceptez nos conditions.</div>
+  </div>
+</div>
+{% endblock %}
