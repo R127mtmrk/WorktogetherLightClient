@@ -1,20 +1,71 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello OrderController!{% endblock %}
+{% block title %}Mes commandes{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/order.css') }}">
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container">
+    <div class="orders-header" style="display:flex;justify-content:space-between;align-items:center;margin:1.2rem 0;">
+        <div>
+            <h1>Mes commandes</h1>
+            <p class="muted">Historique des commandes passées et statut des unités.</p>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="{{ path('app_order_new') }}">Nouvelle commande</a>
+        </div>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/wamp64/www/WorktogetherLightClient/worktogether/src/Controller/OrderController.php</code></li>
-        <li>Your template at <code>C:/wamp64/www/WorktogetherLightClient/worktogether/templates/order/index.html.twig</code></li>
-    </ul>
+    {% if orders is empty %}
+        <div class="card" style="padding:1.2rem;">
+            <strong>Aucune commande trouvée.</strong>
+            <p class="note">Vous n'avez encore passé aucune commande. Cliquez sur "Nouvelle commande" pour commencer.</p>
+        </div>
+    {% else %}
+        <div class="card">
+            <table class="orders-table" style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="text-align:left;border-bottom:1px solid #ddd;">
+                        <th>#</th>
+                        <th>Client</th>
+                        <th>Date</th>
+                        <th>Offre</th>
+                        <th>Quantité</th>
+                        <th>Prix unitaire</th>
+                        <th>Réduction (%)</th>
+                        <th>Total</th>
+                        <th>Unités allouées</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.client ? (order.client.getPseudo() ?: order.client.getEmail()) : '-' }}</td>
+                            <td>{{ order.createdAt ? order.createdAt|date('Y-m-d H:i') : '-' }}</td>
+                            <td>
+                                {% if order.offer %}
+                                    Offre #{{ order.offer.id }}
+                                    {% if order.offer.getPrice() is not null %}
+                                        — {{ order.offer.getPrice() }} €
+                                    {% endif %}
+                                {% else %}
+                                    Aucune
+                                {% endif %}
+                            </td>
+                            <td>{{ order.quantity }}</td>
+                            <td>{{ order.unitPrice is not null ? order.unitPrice ~ ' €' : '-' }}</td>
+                            <td>{{ order.discountPercent is not null ? order.discountPercent ~ ' %' : '-' }}</td>
+                            <td>{{ order.total is not null ? order.total ~ ' €' : '-' }}</td>
+                            <td>{{ order.units|length }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

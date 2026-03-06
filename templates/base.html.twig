@@ -6,6 +6,7 @@
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/landing.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
         {% endblock %}
 
         {% block javascripts %}
@@ -13,6 +14,41 @@
         {% endblock %}
     </head>
     <body>
+
+        {# Navbar - overridable: si un template veut son propre header, il suffit de redéfinir le block 'navbar' #}
+        {% block navbar %}
+            <header class="site-header" role="banner">
+                <div class="inner container">
+                    <a class="brand" href="{{ path('app_dashboard') }}">
+                        <span class="logo" aria-hidden="true"></span>
+                        WorkTogether
+                    </a>
+
+                    <button class="nav-toggle" aria-expanded="false" aria-label="Ouvrir le menu" type="button">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+
+                    <nav class="nav" aria-label="Main navigation">
+                        <a href="{{ path('app_dashboard') }}">Dashboard</a>
+                        <a href="{{ path('app_order') }}">Commandes</a>
+                        <a href="{{ path('app_order_new') }}">Commander</a>
+                    </nav>
+
+                    <div class="nav-actions">
+                        {% if app.user %}
+                            <span class="muted">Bonjour, {{ app.user.getPseudo() ?: app.user.getEmail() }}</span>
+                            <a class="btn" href="{{ path('app_logout') }}">Déconnexion</a>
+                        {% else %}
+                            <a class="btn-outline" href="{{ path('app_register') }}">S'inscrire</a>
+                            <a class="btn" href="{{ path('app_login') }}">Se connecter</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+        {% endblock %}
+
         {# Flash messages globales #}
         <div class="flash-container" aria-live="polite" aria-atomic="true">
             {% for label, messages in app.flashes %}
@@ -25,5 +61,21 @@
         </div>
 
         {% block body %}{% endblock %}
+
+        <script>
+            // Navbar burger toggle simple et accessible
+            document.addEventListener('DOMContentLoaded', function () {
+                const toggle = document.querySelector('.nav-toggle');
+                const header = document.querySelector('.site-header');
+                if (!toggle || !header) return;
+
+                toggle.addEventListener('click', function () {
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                    this.classList.toggle('open');
+                    header.classList.toggle('nav-open');
+                });
+            });
+        </script>
     </body>
 </html>

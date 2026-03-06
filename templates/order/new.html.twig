@@ -2,100 +2,124 @@
 
 {% block title %}Nouvelle commande{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/order.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Nouvelle commande</h1>
+<div class="container">
+    <div class="order-card">
+        <div class="order-header">
+            <div>
+                <div class="order-title">Nouvelle commande</div>
+                <div class="order-sub">Choisissez une offre et la quantité souhaitée.</div>
+            </div>
+            <div class="available-badge">Dispo : <span id="available-count">{{ available }}</span></div>
+        </div>
 
-    <p>Unités disponibles : <strong id="available-count">{{ available }}</strong></p>
+        <div class="form-grid">
+            <div class="form-column">
+                {{ form_start(form) }}
 
-    {{ form_start(form, {'attr': {'id': 'order-form'}}) }}
-        {{ form_row(form.offer) }}
-        {{ form_row(form.quantity) }}
-        {{ form_row(form.unitPrice) }}
-        {{ form_row(form.annualPayment) }}
-        {{ form_row(form.discountPercent) }}
-        {{ form_row(form.total) }}
-        {{ form_row(form.createdAt) }}
-        {{ form_row(form.simulate) }}
+                <div class="form-row">
+                    <label for="{{ form.offer.vars.id }}">Offre</label>
+                    {{ form_widget(form.offer) }}
+                </div>
 
-        <button type="submit">Commander</button>
-    {{ form_end(form) }}
+                <div class="form-row">
+                    <label for="{{ form.quantity.vars.id }}">Quantité</label>
+                    {{ form_widget(form.quantity) }}
+                </div>
 
-    {% if simulate is defined and simulate %}
-        <h2>Résultat de la simulation</h2>
-        <p>Total simulé : {{ simulatedTotal ?? '-' }} €</p>
-        <p>Unités proposées :</p>
-        {% if simulatedUnits is defined and simulatedUnits is not empty %}
-            <ul>
-                {% for id in simulatedUnits %}
-                    <li>Unit #{{ id }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Aucune unité proposée.</p>
-        {% endif %}
-    {% endif %}
+                <div class="form-row">
+                    <label for="{{ form.annualPayment.vars.id }}">Paiement annuel</label>
+                    {{ form_widget(form.annualPayment) }}
+                </div>
 
-    {% block javascripts %}
-        {{ parent() }}
-        <script>
-            (function(){
-                const offerSelect = document.querySelector('#{{ form.offer.vars.id }}');
-                const availableEl = document.getElementById('available-count');
+                <div class="form-row">
+                    <label for="{{ form.discountPercent.vars.id }}">Pourcentage de réduction (facultatif)</label>
+                    {{ form_widget(form.discountPercent) }}
+                </div>
 
-                if (offerSelect) {
-                    offerSelect.addEventListener('change', function () {
-                        const val = this.value;
-                        if (!val) {
-                            return;
-                        }
-                        fetch('{{ path('app_order_available', {'id': 'REPLACE_ID'}) }}'.replace('REPLACE_ID', val))
-                            .then(resp => resp.json())
-                            .then(data => {
-                                if (data && typeof data.available !== 'undefined') {
-                                    availableEl.textContent = data.available;
-                                }
-                            })
-                            .catch(() => {
-                                // ignore network errors silently
-                            });
-                    });
-                }
+                <div class="form-row note">
+                    <label for="{{ form.unitPrice.vars.id }}">Prix unitaire (calculé)</label>
+                    {{ form_widget(form.unitPrice) }}
+                </div>
 
-                // Intercepte la soumission du formulaire et redirige vers /order/confirm via POST
-                const form = document.getElementById('order-form');
-                if (!form) return;
+                <div class="form-row note">
+                    <label for="{{ form.total.vars.id }}">Total (calculé)</label>
+                    {{ form_widget(form.total) }}
+                </div>
 
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
+                <div class="form-row">
+                    <label for="{{ form.createdAt.vars.id }}">Date</label>
+                    {{ form_widget(form.createdAt) }}
+                </div>
 
-                    // Créer un form POST dynamique
-                    const confirmForm = document.createElement('form');
-                    confirmForm.method = 'POST';
-                    confirmForm.action = '{{ path('app_order_confirm') }}';
+                <div class="form-row">
+                    {{ form_widget(form.simulate) }}
+                    <label for="{{ form.simulate.vars.id }}">Simulation (aucune modification en base)</label>
+                </div>
 
-                    // récupérer tous les champs pertinents
-                    const fields = ['{{ form.offer.vars.name }}', '{{ form.quantity.vars.name }}', '{{ form.unitPrice.vars.name }}', '{{ form.annualPayment.vars.name }}', '{{ form.discountPercent.vars.name }}', '{{ form.total.vars.name }}', '{{ form.createdAt.vars.name }}', '{{ form.simulate.vars.name }}'];
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Vérifier / Simuler</button>
+                    <a class="btn btn-ghost" href="{{ path('app_order') }}">Annuler</a>
+                </div>
 
-                    fields.forEach(name => {
-                        const el = form.querySelector('[name="' + name + '"]');
-                        if (!el) return;
+                {{ form_end(form) }}
+            </div>
 
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = el.name;
-                        if (el.type === 'checkbox') {
-                            input.value = el.checked ? '1' : '0';
-                        } else {
-                            input.value = el.value;
-                        }
-                        confirmForm.appendChild(input);
-                    });
+            <aside class="side-column">
+                <div class="simulation-card">
+                    <div class="helper">Simulation & résumé</div>
+                    <div class="note" id="client-note">Le prix unitaire et le total sont calculés côté serveur au moment de la vérification ; cette page affiche une prévisualisation après soumission.</div>
+                    <div style="margin-top:.5rem;font-weight:700">Total simulé : <span id="sim-total">-</span> €</div>
+                    <div class="helper">Unités proposées :</div>
+                    <div id="sim-units-placeholder"><div class="note">Après avoir cliqué sur <strong>Vérifier / Simuler</strong>, vous verrez ici le récapitulatif côté serveur.</div></div>
+                </div>
 
-                    document.body.appendChild(confirmForm);
-                    confirmForm.submit();
-                });
-            })();
-        </script>
-    {% endblock %}
+                <div class="simulation-card">
+                    <div class="helper">Aide</div>
+                    <div class="note">Assurez-vous que la quantité demandée est disponible ; si non, le formulaire affichera une erreur.</div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+<script>
+    (function(){
+        const quantityEl = document.getElementById('{{ form.quantity.vars.id }}');
+        const offerEl = document.getElementById('{{ form.offer.vars.id }}');
+        const availableCountEl = document.getElementById('available-count');
 
+        if (!quantityEl) {
+            return; // éléments manquants, ne pas exécuter le JS
+        }
+
+        function parseIntSafe(v) {
+            const n = parseInt(v, 10);
+            return Number.isNaN(n) ? 0 : n;
+        }
+
+        function updateAvailability() {
+            const selectedIndex = offerEl.selectedIndex;
+            if (selectedIndex < 0) return;
+            const selectedOption = offerEl.options[selectedIndex];
+            const offerAvailable = parseIntSafe(selectedOption.getAttribute('data-available'));
+            availableCountEl.textContent = offerAvailable;
+            const q = parseIntSafe(quantityEl.value);
+            if (q > offerAvailable) {
+                quantityEl.setCustomValidity(`La quantité demandée (${q}) dépasse la disponibilité (${offerAvailable}).`);
+            } else {
+                quantityEl.setCustomValidity('');
+            }
+        }
+
+        offerEl.addEventListener('change', updateAvailability);
+        quantityEl.addEventListener('input', updateAvailability);
+
+        updateAvailability();
+    })();
+</script>
 {% endblock %}

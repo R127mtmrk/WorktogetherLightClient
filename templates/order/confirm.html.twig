@@ -13,7 +13,13 @@
         <p>Total : {{ total }} €</p>
     </div>
 
-    <form method="post" action="{{ path('app_order_submit') }}">
+    {% for label, messages in app.flashes %}
+        {% if label == 'card_error' %}
+            <div style="color:#b00;margin-bottom:1rem;">{{ messages[0] }}</div>
+        {% endif %}
+    {% endfor %}
+
+    <form method="post" action="{{ path('app_order_submit') }}" id="confirm-form">
         <input type="hidden" name="offer" value="{{ offer ? offer.id : '' }}" />
         <input type="hidden" name="quantity" value="{{ quantity }}" />
         <input type="hidden" name="unitPrice" value="{{ unitPrice }}" />
@@ -22,6 +28,12 @@
         <input type="hidden" name="total" value="{{ total }}" />
         <input type="hidden" name="createdAt" value="{{ createdAt }}" />
         <input type="hidden" name="simulate" value="{{ simulate ? 1 : 0 }}" />
+
+        <div style="margin:1rem 0;">
+            <label for="card-number">Numéro de carte (simulation)</label>
+            <input type="text" id="card-number" name="card_number" placeholder="4111 1111 1111 1111" autocomplete="off" />
+            <div id="card-error" style="color:#b00;margin-top:.5rem;display:none;"></div>
+        </div>
 
         <button type="submit" id="confirm-btn">Confirmer la transaction</button>
         <a href="{{ path('app_order_new') }}">Annuler</a>
@@ -37,11 +49,63 @@
     {% endif %}
 
     <script>
-        // petit effet loading avant d'activer le bouton
+        // petit effet loading avant d'activer le bouton; et validation Luhn simple
         document.addEventListener('DOMContentLoaded', function () {
             const btn = document.getElementById('confirm-btn');
+            const form = document.getElementById('confirm-form');
+            const card = document.getElementById('card-number');
+            const cardError = document.getElementById('card-error');
+
             btn.disabled = true;
             setTimeout(() => btn.disabled = false, 1500); // 1.5s de "préparation"
+
+            function luhnCheck(value) {
+                // remove non-digits
+                if (value.length > 16) {
+                    throw new Error(`${value} is too short!`); // les cartes ont au maximum 16 chiffres
+                }
+                const s = value.replace(/\D/g,'');
+                let sum = 0;
+                let shouldDouble = false;
+                for (let i = s.length - 1; i >= 0; i--) {
+                    let digit = parseInt(s.charAt(i), 10);
+                    if (shouldDouble) {
+                        digit *= 2;
+                        if (digit > 9) digit -= 9;
+                    }
+                    sum += digit;
+                    shouldDouble = !shouldDouble;
+                }
+                return (sum % 10) === 0;
+            }
+
+            form.addEventListener('submit', function (e) {
+                // uniquement si ce n'est pas une simulation
+                const simulate = parseInt(form.querySelector('input[name="simulate"]').value) === 1;
+                let prevented = false;
+
+                if (!simulate) {
+                    const val = card ? card.value.trim() : '';
+                    if (!val) {
+                        e.preventDefault();
+                        cardError.style.display = 'block';
+                        cardError.textContent = 'Veuillez saisir un numéro de carte (simulation).';
+                        prevented = true;
+                    }
+
+                    if (!prevented && !luhnCheck(val)) {
+                        e.preventDefault();
+                        cardError.style.display = 'block';
+                        cardError.textContent = 'Numéro de carte invalide (Luhn check).';
+                        prevented = true;
+                    }
+                }
+
+                // Lire la variable pour éviter les avertissements de compilation Twig
+                if (prevented) {
+                    /* soumission stoppée */
+                }
+            });
         });
     </script>
 

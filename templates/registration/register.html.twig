@@ -7,6 +7,9 @@
 
 {% block title %}Inscription{% endblock %}
 
+{# enlever la navbar sur la page d'inscription #}
+{% block navbar %}{% endblock %}
+
 {% block body %}
 <div class="auth-page">
   <div class="auth-card">
@@ -19,30 +22,26 @@
         <div class="form-row">
             {{ form_label(registrationForm.pseudo) }}
             {{ form_widget(registrationForm.pseudo) }}
-            {{ form_errors(registrationForm.pseudo) }}
         </div>
 
         <div class="form-row">
             {{ form_label(registrationForm.email) }}
             {{ form_widget(registrationForm.email) }}
-            {{ form_errors(registrationForm.email) }}
         </div>
 
         <div class="form-row">
-            {{ form_label(registrationForm.plainPassword) }}
+            {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
             {{ form_widget(registrationForm.plainPassword) }}
-            {{ form_errors(registrationForm.plainPassword) }}
         </div>
 
         <div class="form-row">
             {{ form_widget(registrationForm.agreeTerms) }}
             {{ form_label(registrationForm.agreeTerms) }}
-            {{ form_errors(registrationForm.agreeTerms) }}
         </div>
 
         <div class="form-actions">
             <button class="btn" type="submit">S'inscrire</button>
-            <a class="btn-outline" href="{{ path('app_login') }}">Déjà inscrit ? Se connecter</a>
+            <a class="btn-outline" href="{{ path('app_login') }}">Se connecter</a>
         </div>
 
     {{ form_end(registrationForm) }}
