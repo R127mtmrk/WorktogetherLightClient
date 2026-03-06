@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\OrderRepository;
+use App\Repository\OfferRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('/', name: '')]
-    public function index(OrderRepository $orderRepository): Response
+    public function index(OrderRepository $orderRepository, OfferRepository $offerRepository): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -30,8 +31,12 @@ final class DashboardController extends AbstractController
             6
         );
 
+        // récupérer les offres récentes (les 6 dernières)
+        $offers = $offerRepository->findBy([], ['id' => 'DESC'], 6);
+
         return $this->render('dashboard/index.html.twig', [
             'orders' => $orders,
+            'offers' => $offers,
             'controller_name' => 'DashboardController',
         ]);
     }
