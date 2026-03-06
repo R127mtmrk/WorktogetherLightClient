@@ -42,7 +42,8 @@ class Order
     #[ORM\Column(type: 'boolean')]
     private bool $annualPayment = false;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    // rendu nullable pour permettre un champ vide initialement
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?string $discountPercent = null;
 
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
@@ -55,7 +56,8 @@ class Order
     {
         $this->units = new ArrayCollection();
         $this->createdAt = new DateTimeImmutable();
-        $this->discountPercent = '0.00';
+        // supprimer la valeur par défaut pour discountPercent afin qu'il puisse être vide
+        // $this->discountPercent = '0.00';
     }
 
     public function getId(): ?int
@@ -158,7 +160,7 @@ class Order
         return $this->discountPercent;
     }
 
-    public function setDiscountPercent(string $discountPercent): static
+    public function setDiscountPercent(?string $discountPercent): static
     {
         $this->discountPercent = $discountPercent;
 

@@ -15,6 +15,9 @@ class Offer
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name_offer = null;
+
     /**
      * @var Collection<int, Order>
      */
@@ -27,6 +30,9 @@ class Offer
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $minUnits = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive = true;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
@@ -35,6 +41,18 @@ class Offer
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getNameOffer(): ?string
+    {
+        return $this->name_offer;
+    }
+
+    public function setNameOffer(string $name_offer): static
+    {
+        $this->name_offer = $name_offer;
+
+        return $this;
     }
 
     /**
@@ -87,6 +105,18 @@ class Offer
     public function setMinUnits(?int $minUnits): static
     {
         $this->minUnits = $minUnits;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $active): static
+    {
+        $this->isActive = $active;
 
         return $this;
     }

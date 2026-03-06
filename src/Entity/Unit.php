@@ -30,9 +30,6 @@ class Unit
     #[ORM\JoinColumn(nullable: false)]
     private ?State $state = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $price = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -94,18 +91,6 @@ class Unit
     public function setState(?State $state): static
     {
         $this->state = $state;
-
-        return $this;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?string $price): static
-    {
-        $this->price = $price;
 
         return $this;
     }

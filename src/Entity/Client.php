@@ -22,9 +22,16 @@ class Client extends User
     #[ORM\OneToOne(mappedBy: 'client', cascade: ['persist', 'remove'])]
     private ?Ticket $ticket = null;
 
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'client')]
+    private Collection $messages;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
+        $this->messages = new ArrayCollection();
     }
 
     public function isBusiness(): ?bool
@@ -82,6 +89,36 @@ class Client extends User
         }
 
         $this->ticket = $ticket;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): static
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): static
+    {
+        if ($this->messages->removeElement($message)) {
+            // set the owning side to null (unless already changed)
+            if ($message->getClient() === $this) {
+                $message->setClient(null);
+            }
+        }
 
         return $this;
     }
