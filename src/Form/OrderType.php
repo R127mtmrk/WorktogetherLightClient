@@ -2,7 +2,6 @@
 
 namespace App\Form;
 
-use App\Entity\Client;
 use App\Entity\Offer;
 use App\Entity\Order;
 use App\Repository\UnitRepository;
@@ -14,6 +13,10 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Positive;
+use Doctrine\ORM\EntityRepository;
 
 class OrderType extends AbstractType
 {
@@ -27,21 +30,46 @@ class OrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('quantity')
-            ->add('unitPrice')
+            ->add('quantity', IntegerType::class, [
+                'required' => true,
+                'label' => 'Quantité',
+                'attr' => ['min' => 1],
+                'constraints' => [
+                    new NotBlank(message: 'Veuillez indiquer la quantité.'),
+                    new Positive(message: 'La quantité doit être strictement positive.'),
+                ],
+            ])
+            ->add('unitPrice', null, [
+                'disabled' => true,
+                'label' => 'Prix unitaire (calculé)',
+            ])
             ->add('annualPayment')
             ->add('discountPercent')
-            ->add('total')
+            ->add('total', null, [
+                'disabled' => true,
+                'label' => 'Total (calculé)'
+            ])
             ->add('createdAt', null, [
                 'widget' => 'single_text',
-            ])
-            ->add('client', EntityType::class, [
-                'class' => Client::class,
-                'choice_label' => 'id',
             ])
             ->add('offer', EntityType::class, [
                 'class' => Offer::class,
                 'choice_label' => 'id',
+                // n'afficher que les offres actives dans le select
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('o')
+                        ->andWhere('o.isActive = :active')
+                        ->setParameter('active', true)
+                        ->orderBy('o.id', 'ASC');
+                },
+                // ajouter un attribut data-available sur chaque option pour que le JS puisse l'utiliser
+                'choice_attr' => function (?Offer $offer, $key, $value) {
+                    if (!$offer) {
+                        return [];
+                    }
+                    return ['data-available' => (string)$this->unitRepository->countAvailable($offer)];
+                },
+                'required' => false,
             ])
             // champ non mappé pour demander une simulation
             ->add('simulate', CheckboxType::class, [
