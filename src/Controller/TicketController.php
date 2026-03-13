@@ -28,12 +28,16 @@ final class TicketController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $ticket = new Ticket();
-        $ticket->setClient($user);
+        $this->addFlash('error','Cette fonctionnalité n\'est pas encore implémentée. Veuillez contacter le support par email.');
+        return $this->redirectToRoute('app_dashboard');
 
-        return $this->render('ticket/new.html.twig', [
-            'controller_name' => 'TicketController',
-            'ticket' => $ticket,
-        ]);
+
+        //$ticket = new Ticket();
+        //$ticket->setClient($user);
+
+        //return $this->render('dashboard/index.html.twig', [
+        //    'controller_name' => 'TicketController',
+        //    'ticket' => $ticket,
+        //]);
     }
 }
