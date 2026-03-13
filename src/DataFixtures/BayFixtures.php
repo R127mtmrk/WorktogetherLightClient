@@ -17,6 +17,14 @@ class BayFixtures extends Fixture
         $state->setLibelleState('Disponible');
         $manager->persist($state);
 
+        $stateDisable = new State();
+        $stateDisable->setLibelleState('Indisponible');
+        $manager->persist($stateDisable);
+
+        $stateMaintenance = new State();
+        $stateMaintenance->setLibelleState('En maintenance');
+        $manager->persist($stateMaintenance);
+
         $bayNames = ['B01', 'B02', 'B03'];
 
         foreach ($bayNames as $bayName) {
