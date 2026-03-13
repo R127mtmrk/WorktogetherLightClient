@@ -1,8 +1,8 @@
-/* Navbar burger styles */
+@import url('app.css');
 
-/* Hide toggle on desktop */
+/* Navbar burger styles (only specific rules) */
 .nav-toggle{display:none;background:transparent;border:none;cursor:pointer;padding:.5rem;border-radius:8px}
-.nav-toggle .bar{display:block;width:22px;height:2px;background:var(--text,#0b0b0b);margin:4px 0;transition:transform .18s ease,opacity .18s ease}
+.nav-toggle .bar{display:block;width:22px;height:2px;background:var(--bg-dark);margin:4px 0;transition:transform .18s ease,opacity .18s ease}
 
 /* Mobile behavior */
 @media (max-width:720px){

@@ -62,20 +62,7 @@
 
         {% block body %}{% endblock %}
 
-        <script>
-            // Navbar burger toggle simple et accessible
-            document.addEventListener('DOMContentLoaded', function () {
-                const toggle = document.querySelector('.nav-toggle');
-                const header = document.querySelector('.site-header');
-                if (!toggle || !header) return;
-
-                toggle.addEventListener('click', function () {
-                    const expanded = this.getAttribute('aria-expanded') === 'true';
-                    this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-                    this.classList.toggle('open');
-                    header.classList.toggle('nav-open');
-                });
-            });
-        </script>
+        {# Inclusion du fichier JS externe pour le burger et les flashs #}
+        <script src="{{ asset('js/flash.js') }}"></script>
     </body>
 </html>

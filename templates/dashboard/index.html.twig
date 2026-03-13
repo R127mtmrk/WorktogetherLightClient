@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/orders-list-light.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -29,17 +30,16 @@
                 <div class="offer-info">
                   <div>
                     <div class="offer-name">
-                      {% if offer.getPrice is not null %}
-                        Offre - {{ offer.getPrice|number_format(2, '.', ' ') }} €
-                      {% else %}
                         Offre #{{ offer.id }}
-                      {% endif %}
+                        {% if offer.getDiscountPercent() is not null %}
+                            <span class="offer-discount">-{{ offer.getDiscountPercent|number_format(2, '.', ' ') }} %</span>
+                        {% endif %}
                     </div>
-                    <div class="offer-meta">Min units: {{ offer.getMinUnits ?: '-' }}</div>
+                    <div class="offer-meta">Nombre minimal d'unités: {{ offer.getMinUnits ?: '-' }}</div>
                   </div>
                 </div>
                 <div style="text-align:right">
-                  <div style="margin-bottom:.4rem;font-weight:700">{{ offer.getPrice is not null ? (offer.getPrice|number_format(2, '.', ' ')) ~ ' €' : 'Contact' }}</div>
+                  <div style="margin-bottom:.4rem;font-weight:700">Réduction : {{ offer.getDiscountPercent is not null ? (offer.getDiscountPercent|number_format(2, '.', ' ')) ~ ' %' : 'Contact' }}</div>
                   <a href="{{ path('app_order_new') }}?offer={{ offer.id }}" class="btn btn-primary">Commander</a>
                 </div>
               </div>
@@ -50,20 +50,18 @@
     </div>
 
     <div>
-      <section class="card">
+      <section class="card table-card">
         <h2 style="font-size:1.15rem;margin-bottom:.75rem;">Vos dernières commandes</h2>
 
         {% if orders is empty %}
             <p>Vous n'avez aucune commande pour le moment.</p>
         {% else %}
             <div class="table-wrap">
-            <table class="table">
+            <table class="table table-light">
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th>Offre</th>
                         <th>Quantité</th>
-                        <th>Prix unitaire</th>
                         <th>Total</th>
                         <th>Paiement annuel</th>
                         <th>Actions</th>
@@ -72,24 +70,11 @@
                 <tbody>
                     {% for order in orders %}
                         <tr>
-                            <td>{{ order.getCreatedAt ? order.getCreatedAt|date('d/m/Y H:i') : '-' }}</td>
-                            <td>
-                                {% if order.getOffer %}
-                                    {% set o = order.getOffer %}
-                                    {% if o.getPrice is not null %}
-                                        Offre - {{ o.getPrice|number_format(2, '.', ' ') }} €
-                                    {% else %}
-                                        Offre #{{ o.id }}
-                                    {% endif %}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                            <td>{{ order.getQuantity }}</td>
-                            <td>{{ order.getUnitPrice is not null ? (order.getUnitPrice|number_format(2, '.', ' ')) ~ ' €' : '-' }}</td>
-                            <td>{{ order.getTotal is not null ? (order.getTotal|number_format(2, '.', ' ')) ~ ' €' : '-' }}</td>
-                            <td>{{ order.isAnnualPayment ? 'Oui' : 'Non' }}</td>
-                            <td><a class="btn-outline" href="{{ path('app_order') }}">Voir</a></td>
+                            <td data-label="Date">{{ order.getCreatedAt ? order.getCreatedAt|date('d/m/Y') : '-' }}</td>
+                            <td data-label="Quantité">{{ order.getQuantity }}</td>
+                            <td data-label="Total">{{ order.getTotal is not null ? (order.getTotal|number_format(2, '.', ' ')) ~ '€' : '-' }}</td>
+                            <td data-label="Paiement annuel">{{ order.isAnnualPayment ? 'Oui' : 'Non' }}</td>
+                            <td data-label="Actions"><a class="btn-outline" href="{{ path('app_order') }}">Voir</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
