@@ -1,0 +1,48 @@
+@import url('app.css');
+
+:root{
+    --card-shadow: 0 18px 50px rgba(6,8,10,0.06);
+}
+
+/* Reset minimal */
+body { color: var(--bg-dark); font-family: 'Public Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin: 0; padding: 0; }
+
+.container{ max-width: 1100px; margin: 2.2rem auto; padding: 1.2rem; }
+
+.card{ background: var(--card-bg); border-radius: 12px; padding: 1rem; box-shadow: var(--card-shadow); border: 1px solid rgba(11,17,15,0.04); }
+
+.orders-header h1{ font-size: 1.75rem; margin: 0 0 .2rem 0; letter-spacing: -0.5px; }
+.muted{ color: var(--muted); font-size: 0.95rem; }
+
+.btn{ display:inline-block; padding:.6rem .95rem; border-radius:8px; text-decoration:none; font-weight:600; color:var(--card-bg); }
+.btn-primary{ background:var(--accent); color:var(--card-bg); }
+.btn-ghost{ background:transparent; border:1px solid rgba(11,17,15,0.04); color:var(--muted); }
+
+.orders-table{ width:100%; border-collapse:collapse; font-size:1rem; }
+
+.orders-table thead th{ color:var(--muted); font-weight:700; font-size:0.95rem; padding:.9rem .6rem; text-align:left; vertical-align:bottom; border-bottom:1px solid rgba(11,17,15,0.04); }
+
+.orders-table tbody td{ padding:.9rem .6rem; border-top:1px solid rgba(11,17,15,0.04); vertical-align:middle; color:var(--bg-dark); }
+
+.orders-table tbody tr:hover{ background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01)); }
+
+.note{ color:var(--muted); font-size:.95rem; }
+
+.available-badge{ background:transparent; border:1px solid rgba(11,17,15,0.06); padding:.35rem .6rem; border-radius:999px; color:var(--accent); font-weight:700; }
+
+@media (max-width:900px){
+    .orders-table thead{ display:none; }
+    .orders-table, .orders-table tbody, .orders-table tr, .orders-table td{ display:block; width:100%; }
+    .orders-table tr{ margin-bottom:1rem; border-radius:10px; background: var(--card-bg); padding:.8rem; box-shadow:var(--card-shadow); }
+    .orders-table td{ padding:.6rem 0; border-top:none; }
+    .orders-table td:before{ content:attr(data-label); display:block; color:var(--muted); font-size:.85rem; margin-bottom:.25rem; }
+}
+
+.orders-table td.qty, .orders-table td.total{ font-size:1.05rem; font-weight:700; color:var(--accent); }
+
+.helper{ font-size:.9rem; color:var(--muted); }
+
+.table-wrap{ overflow-x:auto; }
+.table-card{ background: var(--card-bg); border: 1px solid rgba(11,17,15,0.04); box-shadow: var(--card-shadow); }
+
+/* End of orders-list overrides */

@@ -1,0 +1,20 @@
+@import url('app.css');
+
+/* Light variant overrides */
+.table-light{ background: #ffffff; color: #0b0b0b; border-radius:8px; }
+.table-light th, .table-light td{ background: transparent; color: #0b0b0b; border-bottom:1px solid rgba(11,17,15,0.06); }
+.table-light thead th{ color:#555; font-weight:700 }
+.table-light tbody tr{ background: transparent }
+.table-light tbody tr:hover{ background: rgba(0,0,0,0.03) }
+.table-light .btn-outline{ border-color: rgba(11,17,15,0.08); color:#0b0b0b }
+.table-light .offer-row, .table-light .offer-info{ background: transparent }
+
+.card.table-card{ background: linear-gradient(180deg,#fff,#fbfbfb); border:1px solid rgba(11,17,15,0.04); }
+
+@media (max-width:900px){
+  .table-light thead{ display:none; }
+  .table-light, .table-light tbody, .table-light tr, .table-light td{ display:block; width:100%; }
+  .table-light tr{ margin-bottom:1rem; border-radius:8px; padding:.6rem; background:#fff }
+  .table-light td{ padding:.5rem 0; border-top:none }
+  .table-light td:before{ content:attr(data-label); display:block; color:#666; font-size:.9rem; margin-bottom:.25rem }
+}

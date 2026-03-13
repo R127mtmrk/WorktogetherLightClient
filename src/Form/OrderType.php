@@ -54,7 +54,7 @@ class OrderType extends AbstractType
             ])
             ->add('offer', EntityType::class, [
                 'class' => Offer::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name_offer',
                 // n'afficher que les offres actives dans le select
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('o')
@@ -62,12 +62,16 @@ class OrderType extends AbstractType
                         ->setParameter('active', true)
                         ->orderBy('o.id', 'ASC');
                 },
-                // ajouter un attribut data-available sur chaque option pour que le JS puisse l'utiliser
+                // ajouter un attribut data-available et data-min/data-max sur chaque option pour que le JS puisse l'utiliser
                 'choice_attr' => function (?Offer $offer, $key, $value) {
                     if (!$offer) {
                         return [];
                     }
-                    return ['data-available' => (string)$this->unitRepository->countAvailable($offer)];
+                    return [
+                        'data-available' => (string)$this->unitRepository->countAvailable($offer),
+                        'data-min' => $offer->getMinUnits() ?? '',
+                        'data-max' => $offer->getMaxUnits() ?? '',
+                    ];
                 },
                 'required' => false,
             ])
@@ -79,7 +83,7 @@ class OrderType extends AbstractType
             ])
         ;
 
-        // Validation: s'assurer qu'il y a suffisamment d'unités disponibles
+        // Validation: s'assurer qu'il y a suffisamment d'unités disponibles et respecter min/max
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             /** @var Order|null $order */
             $order = $event->getData();
@@ -102,6 +106,14 @@ class OrderType extends AbstractType
                 if ($quantity < $min) {
                     $form->get('quantity')->addError(new FormError(sprintf('La quantité doit être au moins %d pour cette offre.', $min)));
                     // on continue afin d'afficher toutes les erreurs éventuelles
+                }
+            }
+
+            // Vérifier le maximum d'unités imposé par l'offre
+            if ($offer && null !== $offer->getMaxUnits()) {
+                $max = $offer->getMaxUnits();
+                if ($quantity > $max) {
+                    $form->get('quantity')->addError(new FormError(sprintf('La quantité doit être au plus %d pour cette offre.', $max)));
                 }
             }
 

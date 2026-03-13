@@ -55,7 +55,6 @@ final class OrderController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        // détecte si l'utilisateur veut une simulation (fausse transaction)
         $simulate = false;
         $dry = $request->query->get('dry') ?? $request->request->get('dry');
         $sim = $request->query->get('simulate') ?? $request->request->get('simulate');
@@ -71,8 +70,6 @@ final class OrderController extends AbstractController
 
         $form = $this->createForm(OrderType::class, $order);
 
-        // Si le client envoie du JSON (ou un body non parsé), Request->request peut être vide.
-        // Dans ce cas on tente de décoder le JSON et de soumettre manuellement le form pour remplir l'entité.
         $content = $request->getContent();
         $parsedJson = null;
         if ($content && empty($request->request->all())) {
@@ -279,6 +276,18 @@ final class OrderController extends AbstractController
         }
 
         $quantity = (int) $quantityRaw;
+
+        // Valider min/max si l'offre définit ces valeurs
+        if ($offer) {
+            if (null !== $offer->getMinUnits() && $quantity < $offer->getMinUnits()) {
+                $this->addFlash('error', sprintf('La quantité minimale pour cette offre est %d.', $offer->getMinUnits()));
+                return $this->redirectToRoute('app_order_new');
+            }
+            if (null !== $offer->getMaxUnits() && $quantity > $offer->getMaxUnits()) {
+                $this->addFlash('error', sprintf('La quantité maximale pour cette offre est %d.', $offer->getMaxUnits()));
+                return $this->redirectToRoute('app_order_new');
+            }
+        }
 
         // Si simulation, récupérer les unités proposées
         $simulatedUnits = [];

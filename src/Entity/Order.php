@@ -190,4 +190,17 @@ class Order
 
         return $this;
     }
+
+    public function getState(): ?string
+    {
+        foreach ($this->getUnits() as $unit) {
+            if ($unit->getState() && $unit->getState()->getLibelleState() !== 'Disponible') {
+                return 'Problème détecté, Maintenance en cours';
+            } else {
+                return 'Aucun problème détecté';
+            }
+
+        }
+        return 'Inactive';
+    }
 }
