@@ -5,6 +5,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/order.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/orders-list.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -30,37 +31,37 @@
                 <thead>
                     <tr style="text-align:left;border-bottom:1px solid #ddd;">
                         <th>#</th>
-                        <th>Client</th>
                         <th>Date</th>
+                        <th>Client</th>
                         <th>Offre</th>
-                        <th>Quantité</th>
                         <th>Prix unitaire</th>
-                        <th>Réduction (%)</th>
                         <th>Total</th>
                         <th>Unités allouées</th>
+                        <th>Statut</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
                         <tr style="border-bottom:1px solid rgba(0,0,0,0.05);">
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.client ? (order.client.getPseudo() ?: order.client.getEmail()) : '-' }}</td>
-                            <td>{{ order.createdAt ? order.createdAt|date('Y-m-d H:i') : '-' }}</td>
-                            <td>
+                            <td data-label="#">{{ order.id }}</td>
+                            <td data-label="Client">{{ order.client ? (order.client.getEmail()) : '-' }}</td>
+                            <td data-label="Date">{{ order.createdAt ? order.createdAt|date('Y-m-d H:i') : '-' }}</td>
+                            <td data-label="Offre">
                                 {% if order.offer %}
-                                    Offre #{{ order.offer.id }}
-                                    {% if order.offer.getPrice() is not null %}
-                                        — {{ order.offer.getPrice() }} €
+                                    Offre {{ order.offer.id }}
+                                    {% if order.offer.getDiscountPercent() is not null %}
+                                        — {{ order.offer.getDiscountPercent() }} %
                                     {% endif %}
                                 {% else %}
                                     Aucune
                                 {% endif %}
                             </td>
-                            <td>{{ order.quantity }}</td>
-                            <td>{{ order.unitPrice is not null ? order.unitPrice ~ ' €' : '-' }}</td>
-                            <td>{{ order.discountPercent is not null ? order.discountPercent ~ ' %' : '-' }}</td>
-                            <td>{{ order.total is not null ? order.total ~ ' €' : '-' }}</td>
-                            <td>{{ order.units|length }}</td>
+                            <td data-label="Prix unitaire">{{ order.unitPrice is not null ? order.unitPrice ~ ' €' : '-' }}</td>
+                            <td class="total" data-label="Total">{{ order.total is not null ? order.total ~ ' €' : '-' }}</td>
+                            <td data-label="Unités">{{ order.units|length }}</td>
+                            <td data-label="Statut">
+                                {{ order.state }}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

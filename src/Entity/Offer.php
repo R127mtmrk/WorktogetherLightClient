@@ -24,11 +24,15 @@ class Offer
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'offer')]
     private Collection $orders;
 
+    // discountPercent: pourcentage de réduction (ex: '10.00' pour 10%)
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
-    private ?string $price = null;
+    private ?string $discountPercent = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $minUnits = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $maxUnits = null;
 
     #[ORM\Column(type: 'boolean')]
     private bool $isActive = true;
@@ -85,14 +89,14 @@ class Offer
         return $this;
     }
 
-    public function getPrice(): ?string
+    public function getDiscountPercent(): ?string
     {
-        return $this->price;
+        return $this->discountPercent;
     }
 
-    public function setPrice(?string $price): static
+    public function setDiscountPercent(?string $discountPercent): static
     {
-        $this->price = $price;
+        $this->discountPercent = $discountPercent;
 
         return $this;
     }
@@ -105,6 +109,18 @@ class Offer
     public function setMinUnits(?int $minUnits): static
     {
         $this->minUnits = $minUnits;
+
+        return $this;
+    }
+
+    public function getMaxUnits(): ?int
+    {
+        return $this->maxUnits;
+    }
+
+    public function setMaxUnits(?int $maxUnits): static
+    {
+        $this->maxUnits = $maxUnits;
 
         return $this;
     }
