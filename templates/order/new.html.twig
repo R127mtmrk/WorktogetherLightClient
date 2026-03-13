@@ -68,6 +68,40 @@
                 </div>
 
                 {{ form_end(form) }}
+
+                {# Si le contrôleur a retourné 'simulate' = true, proposer un formulaire POST vers la route de confirmation
+                   pour les utilisateurs sans JS : envoi des champs essentiels en POST pour afficher la page de confirmation. #}
+                {% if simulate is defined and simulate %}
+                    <div class="simulate-result">
+                        <h3>Simulation prête</h3>
+                        <p>Total simulé : <strong>{{ simulatedTotal is defined ? simulatedTotal : '-' }}</strong> €</p>
+                        <form method="post" action="{{ path('app_order_confirm') }}" style="margin-top:1rem">
+                            <input type="hidden" name="offer" value="{{ form.offer.vars.value is defined ? form.offer.vars.value : (offers|first ? offers|first.id : '') }}" />
+                            <input type="hidden" name="quantity" value="{{ form.quantity.vars.value }}" />
+                            <input type="hidden" name="unitPrice" value="{{ form.unitPrice.vars.value }}" />
+                            <input type="hidden" name="annualPayment" value="{{ form.annualPayment.vars.value ? 1 : 0 }}" />
+                            <input type="hidden" name="discountPercent" value="{{ form.discountPercent.vars.value }}" />
+                            <input type="hidden" name="total" value="{{ simulatedTotal is defined ? simulatedTotal : form.total.vars.value }}" />
+                            <input type="hidden" name="createdAt" value="{{ form.createdAt.vars.value }}" />
+                            <input type="hidden" name="simulate" value="1" />
+
+                            <button class="btn btn-primary" type="submit">Confirmer la transaction (simulate)</button>
+                            <a class="btn btn-ghost" href="{{ path('app_order_new') }}">Retour</a>
+                        </form>
+
+                        {% if simulatedUnits is defined and simulatedUnits is not empty %}
+                            <div style="margin-top:.5rem">
+                                <strong>Unités proposées :</strong>
+                                <ul>
+                                    {% for id in simulatedUnits %}
+                                        <li>Unit #{{ id }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
             </div>
 
             <aside class="side-column">
@@ -102,6 +136,28 @@
             return Number.isNaN(n) ? 0 : n;
         }
 
+        function updatePrice() {
+            const selectedIndex = offerEl.selectedIndex;
+            if (selectedIndex < 0) return;
+            const selectedOption = offerEl.options[selectedIndex];
+            const unitPrice = parseFloat(selectedOption.getAttribute('data-unit-price')) || 0;
+            const discountPercent = parseFloat(document.getElementById('{{ form.discountPercent.vars.id }}').value) || 0;
+            const annualPayment = document.getElementById('{{ form.annualPayment.vars.id }}').checked;
+            let finalUnitPrice = unitPrice;
+
+            if (discountPercent > 0) {
+                finalUnitPrice = unitPrice * (1 - discountPercent / 100);
+            }
+            if (annualPayment) {
+                finalUnitPrice *= 12*0.90; // 10% de réduction pour paiement annuel
+            }
+
+            document.getElementById('{{ form.unitPrice.vars.id }}').value = finalUnitPrice.toFixed(2);
+
+            const quantity = parseIntSafe(quantityEl.value);
+            document.getElementById('{{ form.total.vars.id }}').value = (finalUnitPrice * quantity).toFixed(2);
+        }
+
         function updateAvailability() {
             const selectedIndex = offerEl.selectedIndex;
             if (selectedIndex < 0) return;
@@ -120,6 +176,7 @@
         quantityEl.addEventListener('input', updateAvailability);
 
         updateAvailability();
+        updatePrice();
     })();
 </script>
 {% endblock %}

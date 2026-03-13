@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle offre{% endblock %}
+
+{% block body %}
+    <h1>Nouvelle offre</h1>
+
+    {% for label, messages in app.flashes %}
+        <div class="flash-{{ label }}">{{ messages[0] }}</div>
+    {% endfor %}
+
+    {{ form_start(form) }}
+        <div>
+            <label>Nom</label>
+            {{ form_widget(form.name_offer) }}
+        </div>
+        <div>
+            <label>Prix</label>
+            {{ form_widget(form.price) }}
+        </div>
+        <div>
+            <label>Quantité minimale</label>
+            {{ form_widget(form.minUnits) }}
+        </div>
+        <div>
+            <label>Quantité maximale</label>
+            {{ form_widget(form.maxUnits) }}
+        </div>
+        <div>
+            <label>Active</label>
+            {{ form_widget(form.isActive) }}
+        </div>
+        <div>
+            <button type="submit">Enregistrer</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}
