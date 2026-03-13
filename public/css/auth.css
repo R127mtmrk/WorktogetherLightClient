@@ -1,5 +1,6 @@
 /* Auth styles - black & white with larger text */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Public+Sans:wght@300;400;600;700;800&display=swap');
+@import url('app.css');
 
 :root{
   --bg:#ffffff; /* fond clair comme la landing */
@@ -31,19 +32,19 @@ body{
 .auth-card{width:100%;max-width:540px;background:var(--card-bg);border-radius:12px;padding:2.2rem;box-shadow:var(--card-shadow);border:1px solid rgba(11,17,15,0.04)}
 .auth-brand{display:flex;align-items:center;gap:.8rem;margin-bottom:1rem}
 .auth-brand .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg,#111,#333);display:inline-block}
-.auth-brand h1{font-size:1.35rem;margin:0;font-weight:800;color:var(--hero-dark)}
+.auth-brand h1{font-size:1.35rem;margin:0;font-weight:800;color:var(--bg-dark)}
 .auth-sub{color:var(--muted);margin-bottom:1rem;font-size:1rem}
 
 /* Form styling, adapted from landing's form look */
 .form-row{margin-bottom:1rem}
-label{display:block;font-weight:700;margin-bottom:.4rem;font-size:1.05rem;color:var(--hero-dark)}
+label{display:block;font-weight:700;margin-bottom:.4rem;font-size:1.05rem;color:var(--bg-dark)}
 input[type="email"], input[type="password"], input[type="text"], textarea, select{
   width:100%;
   padding:.85rem 1rem;
   border-radius:10px;
   border:1px solid rgba(11,17,15,0.06);
   background:linear-gradient(180deg, rgba(250,250,250,1), rgba(245,245,245,1));
-  color:var(--hero-dark);
+  color:var(--bg-dark);
   font-size:1.03rem;
 }
 input::placeholder{color:rgba(107,111,115,0.45)}
@@ -51,8 +52,8 @@ input:focus{outline:none;box-shadow:0 10px 30px rgba(6,8,10,0.06);border-color:r
 
 /* Actions */
 .form-actions{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.25rem}
-.btn{display:inline-block;padding:.85rem 1.25rem;border-radius:8px;text-decoration:none;font-weight:700;background:#111;color:#fff;border:none;cursor:pointer;font-size:1rem}
-.btn-outline{background:transparent;color:var(--hero-dark);border:1px solid rgba(11,17,15,0.06);padding:.7rem 1rem;border-radius:8px}
+.btn{display:inline-block;padding:.85rem 1.25rem;border-radius:8px;text-decoration:none;font-weight:700;background:var(--bg-dark);color:#fff;border:none;cursor:pointer;font-size:1rem}
+.btn-outline{background:transparent;color:var(--bg-dark);border:1px solid rgba(11,17,15,0.06);padding:.7rem 1rem;border-radius:8px}
 
 /* Errors & success (flash-like) */
 .form-errors{background:#fff5f5;border:1px solid rgba(220,38,38,0.08);padding:.9rem;border-radius:8px;color:#7a1717;margin-bottom:1rem;font-weight:700;font-size:0.98rem}

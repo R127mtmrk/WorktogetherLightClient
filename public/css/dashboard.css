@@ -1,14 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Public+Sans:wght@300;400;600;700;800&display=swap');
+@import url('app.css');
 
 :root{
-  --bg-hero-start:#050505;
-  --bg-hero-end:#141414;
-  --text:#0b0b0b;
-  --muted:#7d8287;
-  --card-bg:#ffffff;
-  --card-shadow: 0 18px 50px rgba(6,8,10,0.06);
-  --glass: rgba(255,255,255,0.04);
-  --accent:#111;
   --max-width:1200px;
 }
 
@@ -59,8 +51,8 @@ body{
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem .9rem;border-radius:8px;text-decoration:none;font-weight:700;cursor:pointer;border:none}
-.btn-primary{background:#111;color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
-.btn-outline{background:transparent;border:1px solid rgba(11,17,15,0.06);color:var(--text);padding:.5rem .75rem;border-radius:8px}
+.btn-primary{background:var(--bg-dark);color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
+.btn-outline{background:transparent;border:1px solid rgba(11,17,15,0.06);color:var(--bg-dark);padding:.5rem .75rem;border-radius:8px}
 
 /* KPI */
 .kpis{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
