@@ -46,14 +46,37 @@ h3{font-size:1.05rem;margin:0 0 .45rem;font-weight:700}
 
 /* Site header / navbar shared */
 .site-header{
-  position:sticky;top:0;z-index:60;background:rgba(255,255,255,0.96);backdrop-filter: blur(4px);border-bottom:1px solid rgba(11,17,15,0.04);
+  position:sticky;top:0;z-index:10001;background:rgba(255,255,255,0.96);backdrop-filter: blur(4px);border-bottom:1px solid rgba(11,17,15,0.04);
 }
 .site-header .inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem}
 .nav{display:flex;gap:.5rem;align-items:center}
 .nav a{color:var(--muted);text-decoration:none;padding:.45rem .6rem;border-radius:.5rem;font-weight:600}
 .nav a:hover{color:var(--bg-dark);background:rgba(0,0,0,0.04)}
-.nav-actions{display:flex;align-items:center;gap:.6rem}
-.nav-actions .muted{color:var(--muted)}
+.nav-actions{display:flex;align-items:center;gap:.75rem;z-index:10002}
+.nav-actions a, .nav-actions button{display:inline-flex;align-items:center;gap:.4rem}
+.nav-actions a.btn, .nav-actions a.btn-outline{padding:.45rem .85rem;border-radius:8px;text-decoration:none}
+.nav-actions a.btn{background:transparent;border:1px solid rgba(11,17,15,0.06);color:var(--bg-dark)}
+.nav-actions a.btn:hover{background:rgba(0,0,0,0.03)}
+
+/* Ensure .nav sits under the actions when absolutely positioned */
+.site-header .nav{z-index:10000}
+
+/* Force-visible nav-actions on desktop (more specificity to override other rules) */
+.site-header .nav-actions{display:flex !important;align-items:center;gap:.75rem;z-index:10002}
+
+/* Stronger rules for action links inside the header */
+.site-header .nav-actions a, .site-header .nav-actions button{
+  display:inline-flex !important;
+  align-items:center;
+  gap:.4rem;
+  padding:.45rem .85rem;
+  border-radius:8px;
+  text-decoration:none;
+  color:var(--bg-dark) !important;
+  background:transparent !important;
+  border:1px solid rgba(11,17,15,0.06) !important;
+}
+.site-header .nav-actions a.btn-primary{background:var(--bg-dark);color:#fff;border-color:transparent}
 
 /* Navbar burger (mobile) - consistent with previous */
 .nav-toggle{display:none;background:transparent;border:none;cursor:pointer;padding:.5rem;border-radius:8px}
@@ -80,6 +103,16 @@ h3{font-size:1.05rem;margin:0 0 .45rem;font-weight:700}
 .btn-primary{background:var(--bg-dark);color:#fff;box-shadow:0 10px 30px rgba(0,0,0,0.12)}
 .btn-outline{background:transparent;border:1px solid rgba(11,17,15,0.06);color:var(--bg-dark);padding:.5rem .75rem;border-radius:8px}
 .btn-ghost{background:transparent;color:var(--bg-dark);border:1px solid rgba(0,0,0,0.02)}
+
+/* Ensure nav-actions buttons remain visible and clickable */
+.nav-actions .btn{
+  background:transparent;
+  border:1px solid rgba(11,17,15,0.06);
+  color:var(--bg-dark);
+  padding:.45rem .75rem;
+  border-radius:8px;
+  font-weight:700;
+}
 
 /* Forms */
 label{display:block;font-weight:700;margin-bottom:.35rem;color:var(--bg-dark)}
@@ -118,5 +151,4 @@ input::placeholder{color:rgba(107,111,115,0.45)}
 
 /* Small polished touches for harmony */
 .small-muted{color:var(--muted);font-size:0.95rem}
-
-/* End of app.css */
+.site-footer{background-color: rgba(128, 128, 128, 0.16);margin-top:3rem;padding:1.5rem 1rem;text-align:center;color:var(--muted);font-size:0.95rem;border-top:1px solid rgba(11,17,15,0.04)}

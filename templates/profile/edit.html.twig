@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil — WorkTogether{% endblock %}
+
+{% block body %}
+<div class="container profile">
+    <h1>Modifier mon profil</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.pseudo) }}
+        <div>
+            <button class="btn">Enregistrer</button>
+            <a class="btn-outline" href="{{ path('profile_index') }}">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

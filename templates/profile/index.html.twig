@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon espace — WorkTogether{% endblock %}
+
+{% block body %}
+<div class="container profile">
+    <h1>Mon espace</h1>
+
+    <section class="profile-card">
+        <h2>Profil</h2>
+        <dl>
+            <dt>Pseudo</dt>
+            <dd>{{ user.getPseudo() }}</dd>
+            <dt>Email</dt>
+            <dd>{{ user.getEmail() }}</dd>
+            <dt>Unités restantes</dt>
+            <dd>{{ unitsRemaining|default(0) }}</dd>
+        </dl>
+
+        <div class="actions">
+            <a class="btn" href="{{ path('profile_edit') }}">Modifier le profil</a>
+            <a class="btn" href="{{ path('profile_change_password') }}">Changer le mot de passe</a>
+            <a class="btn" href="{{ path('profile_orders') }}">Voir mes commandes</a>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

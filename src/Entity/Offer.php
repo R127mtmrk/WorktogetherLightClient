@@ -18,6 +18,7 @@ class Offer
     #[ORM\Column(length: 255)]
     private ?string $name_offer = null;
 
+
     /**
      * @var Collection<int, Order>
      */

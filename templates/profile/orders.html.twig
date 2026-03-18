@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes commandes — WorkTogether{% endblock %}
+
+{% block body %}
+<div class="container profile orders">
+    <h1>Mes commandes</h1>
+
+    {% if orders is empty %}
+        <p>Aucune commande pour le moment.</p>
+    {% else %}
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Quantité</th>
+                    <th>Prix unité</th>
+                    <th>Discount %</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.createdAt ? order.createdAt|date('Y-m-d H:i') : '' }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>{{ order.unitPrice }}</td>
+                        <td>{{ order.discountPercent }}</td>
+                        <td>{{ order.total }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

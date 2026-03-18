@@ -10,7 +10,7 @@ html,body{height:100%}
 body{
   margin:0;
   font-family: 'Public Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  color:var(--text);
+  color:var(--bg-dark);
   background:linear-gradient(180deg, #fafafa, #fff);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;

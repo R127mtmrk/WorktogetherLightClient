@@ -1,0 +1,22 @@
+@import url('app.css');
+
+/* Profile / Dashboard styles adapted to shared variables from app.css */
+
+.profile-card{background:var(--card-bg);padding:1.6rem;border-radius:10px;box-shadow:var(--card-shadow)}
+.profile-card h2{margin-top:0}
+.profile-card dl{display:grid;grid-template-columns:180px 1fr;gap:.6rem .8rem}
+.profile-card dt{color:var(--muted);font-weight:700}
+.profile-card dd{margin:0}
+
+.actions{margin-top:1rem}
+.btn{display:inline-block;background:transparent;border:1px solid rgba(11,17,15,0.06);padding:.6rem 1rem;border-radius:8px;color:var(--bg-dark);text-decoration:none}
+.btn-outline{background:transparent;border:1px solid rgba(11,17,15,0.04);padding:.6rem 1rem;border-radius:8px;color:var(--muted);text-decoration:none}
+
+.orders-table{width:100%;border-collapse:collapse;margin-top:1rem;background:transparent}
+.orders-table th, .orders-table td{padding:.8rem;border-bottom:1px solid rgba(11,17,15,0.04);text-align:left}
+.orders-table thead th{color:var(--muted);font-size:.9rem}
+
+/* Responsive */
+@media (max-width:720px){
+  .profile-card dl{grid-template-columns:1fr}
+}

@@ -29,13 +29,12 @@
 <section class="hero">
     <div class="content container">
         <span class="kicker">Service d'abonnement</span>
-        <h1>Accédez à des unités à la demande — Abonnez, regardez, utilisez.</h1>
+        <h1>Accédez à des <span class="highlight">unités</span> à la demande — Abonnez, regardez, utilisez.</h1>
         <p class="lead">WorkTogether vous propose un système d'abonnement simple pour obtenir des unités, attribuées à votre compte et utilisables immédiatement. Planifiez, consommez, et gérez vos unités depuis votre dashboard.</p>
 
         <div class="cta">
-            <a class="btn btn-primary" href="{{ path('app_register') }}">Créer un compte</a>
-            <a class="btn btn-ghost" href="{{ path('app_login') }}">Se connecter</a>
-            <a class="btn btn-cta" href="{{ path('app_order_new') }}">Commander des unités</a>
+            <a class="btn-primary" href="{{ path('app_register') }}">Créer un compte</a>
+            <a class="btn-ghost" href="{{ path('app_login') }}">Se connecter</a>
         </div>
     </div>
 
@@ -45,11 +44,11 @@
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
                 <div>
                     <strong style="font-size:1.1rem;display:block">Votre compte</strong>
-                    <small style="color:rgba(255,255,255,0.8)">Statistiques en temps réel</small>
+                    <small style="color:var(--muted)">Statistiques en temps réel</small>
                 </div>
                 <div style="text-align:right">
                     <div style="font-weight:800;font-size:1.4rem">24</div>
-                    <div style="font-size:0.85rem;color:rgba(255,255,255,0.85)">unités restantes</div>
+                    <div style="font-size:0.85rem;color:var(--muted)">unités restantes</div>
                 </div>
             </div>
 
@@ -57,6 +56,71 @@
                 <path d="M0 80 C120 20 240 120 360 60 C480 0 600 80 720 40" stroke="#8be0c4" stroke-width="3" fill="none" stroke-linecap="round"/>
             </svg>
         </div>
+    </div>
+</section>
+
+<section class="offers-section">
+    <div class="container">
+        <h2 style="text-align:center;margin-bottom:1rem">Nos Offres</h2>
+
+        {% if offers is empty %}
+            <p class="small-muted" style="text-align:center">Aucune offre disponible pour le moment. Revenez bientôt.</p>
+        {% else %}
+            <div class="offers-grid" role="list">
+                {% for offer in offers %}
+                    <article class="offer-card" role="listitem" aria-labelledby="offer-{{ offer.id }}" style="--i:{{ loop.index0 }};">
+                        <div class="offer-thumb" aria-hidden="true"></div>
+
+                        <div class="offer-top">
+                            <div>
+                                <h3 id="offer-{{ offer.id }}" class="offer-name">{{ offer.nameOffer|default('Offre') }}</h3>
+                                {# l'entité Offer ne contient pas de description; on peut afficher min/max unités #}
+                                <p class="offer-desc small-muted">
+                                    {% if offer.minUnits and offer.maxUnits %}
+                                        {{ offer.minUnits }} – {{ offer.maxUnits }} unités
+                                    {% elseif offer.minUnits %}
+                                        À partir de {{ offer.minUnits }} unités
+                                    {% elseif offer.maxUnits %}
+                                        Jusqu'à {{ offer.maxUnits }} unités
+                                    {% else %}
+                                        Aucun minimum ni maximum
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div style="display:flex;flex-direction:column;gap:.4rem;align-items:end">
+                                {% if offer.discountPercent is not null and (offer.discountPercent + 0) > 0 %}
+                                    <div class="offer-badge" data-type="discount" aria-hidden="true">-{{ (offer.discountPercent + 0)|round(2) }}%</div>
+                                {% endif %}
+
+                                {% if not offer.isActive %}
+                                    <div class="offer-badge" data-type="inactive">Inactive</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="offer-meta">
+                            <div class="offer-price" aria-label="information sur l'offre">
+                                {% if offer.discountPercent is not null and (offer.discountPercent + 0) > 0 %}
+                                    Offre: -{{ (offer.discountPercent + 0)|round(2) }}%
+                                {% else %}
+                                    Offre standard
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="offer-actions">
+                            {% if offer.isActive %}
+                                <a class="btn-primary" href="{{ path('app_order_new', {'offerId': offer.id}) }}" aria-label="Commander {{ offer.nameOffer|default('cette offre') }}">Commander</a>
+                            {% else %}
+                                <button class="btn-ghost" disabled aria-disabled="true" title="Offre inactive" aria-label="Offre inactive">Commander</button>
+                            {% endif %}
+                            <a class="btn-ghost" href="{{ path('app_order') }}">Mes commandes</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 </section>
 
