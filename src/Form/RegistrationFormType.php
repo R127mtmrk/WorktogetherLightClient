@@ -20,10 +20,15 @@ class RegistrationFormType extends AbstractType
             ->add('pseudo')
             ->add('email')
             ->add('agreeTerms', CheckboxType::class, [
+                'label' => 'J\'accepte les conditions d\'utilisation',
                 'mapped' => false,
                 'constraints' => [
                     new IsTrue(message: 'You should agree to our terms.'),
                 ],
+            ])
+            ->add('IsBusiness', CheckboxType::class, [
+                'label' => 'S\'inscrire en tant qu\'entreprise',
+                'required' => false,
             ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,

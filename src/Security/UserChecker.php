@@ -19,6 +19,14 @@ class UserChecker implements UserCheckerInterface
         }
     }
 
+    public function checkIsConnectable(UserInterface $user): bool
+    {
+        if ($user instanceof Client) {
+            return $user->getPwdErr() < 3; // Allow connection if password error count is less than 3
+        }
+        return true; // For other user types, allow connection by default
+    }
+
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
         // no additional checks after authentication for now

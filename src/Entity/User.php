@@ -48,6 +48,12 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\Column]
+    private ?float $pwd_err = 0;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $token = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -158,5 +164,29 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function IsAccountant(): Boolean
     {
         return array_any($this->getRoles(), fn($role) => $role === "ROLE_ACCOUNTANT");
+    }
+
+    public function getPwdErr(): ?float
+    {
+        return $this->pwd_err;
+    }
+
+    public function setPwdErr(float $pwd_err): static
+    {
+        $this->pwd_err = $pwd_err;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(?string $token): static
+    {
+        $this->token = $token;
+
+        return $this;
     }
 }

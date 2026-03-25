@@ -39,6 +39,11 @@
             {{ form_label(registrationForm.agreeTerms) }}
         </div>
 
+      <div class="form-row">
+          {{ form_widget(registrationForm.IsBusiness) }}
+          {{ form_label(registrationForm.IsBusiness) }}
+      </div>
+
         <div class="form-actions">
             <button class="btn" type="submit">S'inscrire</button>
             <a class="btn-outline" href="{{ path('app_login') }}">Se connecter</a>

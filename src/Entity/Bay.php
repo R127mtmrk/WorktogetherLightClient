@@ -24,6 +24,9 @@ class Bay
     #[ORM\OneToMany(targetEntity: Unit::class, mappedBy: 'bay')]
     private Collection $units;
 
+    #[ORM\OneToMany(targetEntity: State::class, mappedBy: 'bay')]
+    private ?int $units_total = null;
+
     public function __construct()
     {
         $this->units = new ArrayCollection();
@@ -42,6 +45,21 @@ class Bay
     public function setNameBay(string $name_bay): static
     {
         $this->name_bay = $name_bay;
+
+        return $this;
+    }
+
+    public function getUnitsTotal(): Collection
+    {
+        return $this->units;
+    }
+
+    public function setUnitsTotal(Unit $unit): static
+    {
+        if (!$this->units_total->contains($unit)) {
+            $this->units_total->add($unit);
+            $unit->setBay($this);
+        }
 
         return $this;
     }

@@ -30,6 +30,7 @@ class RegistrationController extends AbstractController
 
             // ensure role
             $user->setRoles(['ROLE_CLIENT']);
+            $user->setPwdErr(0);
 
             $entityManager->persist($user);
             $entityManager->flush();

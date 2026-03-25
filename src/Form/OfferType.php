@@ -28,7 +28,7 @@ class OfferType extends AbstractType
                 'required' => false,
                 'scale' => 2,
                 'attr' => ['min' => 0, 'max' => 100],
-                'constraints' => [new Range(['min' => 0, 'max' => 100])],
+                'constraints' => [new Range(min: 0, max: 100)],
             ])
             ->add('minUnits', IntegerType::class, [
                 'label' => 'Quantité minimale',

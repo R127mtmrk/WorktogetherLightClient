@@ -18,14 +18,36 @@
             <div class="available-badge">Dispo : <span id="available-count">{{ available }}</span></div>
         </div>
 
+        {# Banner explaining offer selection is disabled by default #}
+        {% if allow_offer_select is defined and not allow_offer_select %}
+            <div class="offer-banner">
+                <div class="offer-banner-inner container">
+                    <strong>Sélection d'offres désactivée</strong>
+                    <span>Pour choisir une offre, cliquez sur "Commander" depuis la page "Offres" ou utilisez les liens offerts par les promos.</span>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="form-grid">
             <div class="form-column">
-                {{ form_start(form) }}
+                {% if compact is defined and compact and selectedOffer is defined and selectedOffer %}
+                    <div class="offer-summary">
+                        <h3>Offre sélectionnée : {{ selectedOffer.nameOffer }}</h3>
+                        <p>Réduction : {{ selectedOffer.discountPercent ? selectedOffer.discountPercent ~ '%' : '—' }}</p>
+                        <p>Quantité minimale : {{ selectedOffer.minUnits ?: '—' }}</p>
+                        <p>Quantité maximale : {{ selectedOffer.maxUnits ?: '—' }}</p>
+                    </div>
+                {% endif %}
 
-                <div class="form-row">
-                    <label for="{{ form.offer.vars.id }}">Offre</label>
-                    {{ form_widget(form.offer) }}
-                </div>
+                {# form submitted directly to submit route to persist in one click #}
+                {{ form_start(form, {'action': path('app_order_submit'), 'attr': {'id': 'order-form'}}) }}
+
+                {% if form.offer is defined %}
+                    <div class="form-row">
+                        <label for="{{ form.offer.vars.id }}">Offre</label>
+                        {{ form_widget(form.offer) }}
+                    </div>
+                {% endif %}
 
                 <div class="form-row">
                     <label for="{{ form.quantity.vars.id }}">Quantité</label>
@@ -33,13 +55,13 @@
                 </div>
 
                 <div class="form-row">
-                    <label for="{{ form.annualPayment.vars.id }}">Paiement annuel</label>
-                    {{ form_widget(form.annualPayment) }}
+                    <label for="{{ form.paymentType.vars.id }}">Type de paiement</label>
+                    {{ form_widget(form.paymentType) }}
                 </div>
 
                 <div class="form-row">
-                    <label for="{{ form.discountPercent.vars.id }}">Pourcentage de réduction (facultatif)</label>
-                    {{ form_widget(form.discountPercent) }}
+                    <label for="{{ form.annualPayment.vars.id }}">Paiement annuel</label>
+                    {{ form_widget(form.annualPayment) }}
                 </div>
 
                 <div class="form-row note">
@@ -52,131 +74,73 @@
                     {{ form_widget(form.total) }}
                 </div>
 
+                {# champ pour numéro de carte requis par submit() #}
                 <div class="form-row">
-                    <label for="{{ form.createdAt.vars.id }}">Date</label>
-                    {{ form_widget(form.createdAt) }}
+                    <label for="card-number">Numéro de carte</label>
+                    <input type="text" id="card-number" name="card_number" placeholder="4111 1111 1111 1111" autocomplete="off" />
+                    <div id="card-error" class="note" style="display:none;color:#b00;margin-top:.5rem"></div>
                 </div>
 
-                <div class="form-row">
-                    {{ form_widget(form.simulate) }}
-                    <label for="{{ form.simulate.vars.id }}">Simulation (aucune modification en base)</label>
-                </div>
+                {# si compact, transmettre l'id d'offre via un champ caché pour la confirmation/submission #}
+                {% if compact is defined and compact and selectedOffer is defined and selectedOffer %}
+                    <input type="hidden" name="offer" value="{{ selectedOffer.id }}" />
+                {% endif %}
 
                 <div class="form-actions">
-                    <button class="btn btn-primary" type="submit">Vérifier / Simuler</button>
+                    <button class="btn btn-primary" type="submit" id="order-submit">Confirmer la transaction</button>
                     <a class="btn btn-ghost" href="{{ path('app_order') }}">Annuler</a>
                 </div>
 
-                {{ form_end(form) }}
-
-                {# Si le contrôleur a retourné 'simulate' = true, proposer un formulaire POST vers la route de confirmation
-                   pour les utilisateurs sans JS : envoi des champs essentiels en POST pour afficher la page de confirmation. #}
-                {% if simulate is defined and simulate %}
-                    <div class="simulate-result">
-                        <h3>Simulation prête</h3>
-                        <p>Total simulé : <strong>{{ simulatedTotal is defined ? simulatedTotal : '-' }}</strong> €</p>
-                        <form method="post" action="{{ path('app_order_confirm') }}" style="margin-top:1rem">
-                            <input type="hidden" name="offer" value="{{ form.offer.vars.value is defined ? form.offer.vars.value : (offers|first ? offers|first.id : '') }}" />
-                            <input type="hidden" name="quantity" value="{{ form.quantity.vars.value }}" />
-                            <input type="hidden" name="unitPrice" value="{{ form.unitPrice.vars.value }}" />
-                            <input type="hidden" name="annualPayment" value="{{ form.annualPayment.vars.value ? 1 : 0 }}" />
-                            <input type="hidden" name="discountPercent" value="{{ form.discountPercent.vars.value }}" />
-                            <input type="hidden" name="total" value="{{ simulatedTotal is defined ? simulatedTotal : form.total.vars.value }}" />
-                            <input type="hidden" name="createdAt" value="{{ form.createdAt.vars.value }}" />
-                            <input type="hidden" name="simulate" value="1" />
-
-                            <button class="btn btn-primary" type="submit">Confirmer la transaction (simulate)</button>
-                            <a class="btn btn-ghost" href="{{ path('app_order_new') }}">Retour</a>
-                        </form>
-
-                        {% if simulatedUnits is defined and simulatedUnits is not empty %}
-                            <div style="margin-top:.5rem">
-                                <strong>Unités proposées :</strong>
-                                <ul>
-                                    {% for id in simulatedUnits %}
-                                        <li>Unit #{{ id }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                    </div>
+                {# Render discountPercent and selectedOffer as hidden widgets so they don't appear below the button as "rest" fields #}
+                {% if form.discountPercent is defined %}
+                    {{ form_widget(form.discountPercent, { attr: { style: 'display:none' } }) }}
                 {% endif %}
+                {% if form.selectedOffer is defined %}
+                    {{ form_widget(form.selectedOffer, { attr: { style: 'display:none' } }) }}
+                {% endif %}
+
+                {{ form_end(form) }}
 
             </div>
 
             <aside class="side-column">
                 <div class="simulation-card">
-                    <div class="helper">Simulation & résumé</div>
-                    <div class="note" id="client-note">Le prix unitaire et le total sont calculés côté serveur au moment de la vérification ; cette page affiche une prévisualisation après soumission.</div>
-                    <div style="margin-top:.5rem;font-weight:700">Total simulé : <span id="sim-total">-</span> €</div>
+                    <div class="helper">Récapitulatif</div>
+                    <div class="note" id="client-note">Le prix unitaire et le total sont calculés côté client pour faciliter la saisie, et recalculés côté serveur lors de la confirmation.</div>
+                    <div style="margin-top:.5rem;font-weight:700">Total estimé : <span id="sim-total">-</span> €</div>
                     <div class="helper">Unités proposées :</div>
-                    <div id="sim-units-placeholder"><div class="note">Après avoir cliqué sur <strong>Vérifier / Simuler</strong>, vous verrez ici le récapitulatif côté serveur.</div></div>
+                    <div id="sim-units-placeholder"><div class="note">Le détail des unités allouées sera affiché après confirmation.</div></div>
                 </div>
 
                 <div class="simulation-card">
                     <div class="helper">Aide</div>
-                    <div class="note">Assurez-vous que la quantité demandée est disponible ; si non, le formulaire affichera une erreur.</div>
+                    <div class="note">Assurez-vous que la quantité demandée est disponible ; si non, la soumission sera rejetée et un message d'erreur s'affichera.</div>
                 </div>
             </aside>
         </div>
     </div>
 </div>
-<script>
-    (function(){
-        const quantityEl = document.getElementById('{{ form.quantity.vars.id }}');
-        const offerEl = document.getElementById('{{ form.offer.vars.id }}');
-        const availableCountEl = document.getElementById('available-count');
 
-        if (!quantityEl) {
-            return; // éléments manquants, ne pas exécuter le JS
-        }
-
-        function parseIntSafe(v) {
-            const n = parseInt(v, 10);
-            return Number.isNaN(n) ? 0 : n;
-        }
-
-        function updatePrice() {
-            const selectedIndex = offerEl.selectedIndex;
-            if (selectedIndex < 0) return;
-            const selectedOption = offerEl.options[selectedIndex];
-            const unitPrice = parseFloat(selectedOption.getAttribute('data-unit-price')) || 0;
-            const discountPercent = parseFloat(document.getElementById('{{ form.discountPercent.vars.id }}').value) || 0;
-            const annualPayment = document.getElementById('{{ form.annualPayment.vars.id }}').checked;
-            let finalUnitPrice = unitPrice;
-
-            if (discountPercent > 0) {
-                finalUnitPrice = unitPrice * (1 - discountPercent / 100);
-            }
-            if (annualPayment) {
-                finalUnitPrice *= 12*0.90; // 10% de réduction pour paiement annuel
-            }
-
-            document.getElementById('{{ form.unitPrice.vars.id }}').value = finalUnitPrice.toFixed(2);
-
-            const quantity = parseIntSafe(quantityEl.value);
-            document.getElementById('{{ form.total.vars.id }}').value = (finalUnitPrice * quantity).toFixed(2);
-        }
-
-        function updateAvailability() {
-            const selectedIndex = offerEl.selectedIndex;
-            if (selectedIndex < 0) return;
-            const selectedOption = offerEl.options[selectedIndex];
-            const offerAvailable = parseIntSafe(selectedOption.getAttribute('data-available'));
-            availableCountEl.textContent = offerAvailable;
-            const q = parseIntSafe(quantityEl.value);
-            if (q > offerAvailable) {
-                quantityEl.setCustomValidity(`La quantité demandée (${q}) dépasse la disponibilité (${offerAvailable}).`);
-            } else {
-                quantityEl.setCustomValidity('');
-            }
-        }
-
-        offerEl.addEventListener('change', updateAvailability);
-        quantityEl.addEventListener('input', updateAvailability);
-
-        updateAvailability();
-        updatePrice();
-    })();
-</script>
+{% block javascripts %}
+    {{ parent() }}
+    <script>window.ORDER_BASE_UNIT_PRICE = '10.00';</script>
+    <script src="{{ asset('js/order.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            window.OrderUI.init({
+                quantityId: '{{ form.quantity.vars.id }}',
+                unitPriceId: '{{ form.unitPrice.vars.id }}',
+                totalId: '{{ form.total.vars.id }}',
+                discountId: '{{ form.discountPercent.vars.id }}',
+                annualId: '{{ form.annualPayment.vars.id }}',
+                offerSelectId: '{{ form.offer is defined ? form.offer.vars.id : '' }}',
+                availableId: 'available-count',
+                cardId: 'card-number',
+                formId: 'order-form',
+                submitBtnId: 'order-submit',
+                cardErrorId: 'card-error'
+            });
+        });
+    </script>
+{% endblock %}
 {% endblock %}

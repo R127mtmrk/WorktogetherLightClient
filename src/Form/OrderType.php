@@ -12,8 +12,8 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 use Doctrine\ORM\EntityRepository;
@@ -29,11 +29,15 @@ class OrderType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $compact = $options['compact'] ?? false;
+        $allowOfferSelect = $options['allow_offer_select'] ?? false;
+        $offerOption = $options['offer'] ?? null;
+
         $builder
             ->add('quantity', IntegerType::class, [
                 'required' => true,
                 'label' => 'Quantité',
-                'attr' => ['min' => 1],
+                'attr' => ['min' => 1] + ($compact ? ['readonly' => true] : []),
                 'constraints' => [
                     new NotBlank(message: 'Veuillez indiquer la quantité.'),
                     new Positive(message: 'La quantité doit être strictement positive.'),
@@ -49,10 +53,21 @@ class OrderType extends AbstractType
                 'disabled' => true,
                 'label' => 'Total (calculé)'
             ])
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
+            ->add('paymentType', ChoiceType::class, [
+                'mapped' => false,
+                'label' => 'Type de paiement',
+                'choices' => [
+                    'Carte' => 'card',
+                    'Virement' => 'bank_transfer',
+                    'Manuel' => 'manual',
+                ],
+                'required' => true,
             ])
-            ->add('offer', EntityType::class, [
+        ;
+
+        // Si non en mode compact et que la sélection d'offre est autorisée, ajouter le select d'offres
+        if (!$compact && $allowOfferSelect) {
+            $builder->add('offer', EntityType::class, [
                 'class' => Offer::class,
                 'choice_label' => 'name_offer',
                 // n'afficher que les offres actives dans le select
@@ -69,22 +84,27 @@ class OrderType extends AbstractType
                     }
                     return [
                         'data-available' => (string)$this->unitRepository->countAvailable($offer),
+                        'data-discount' => $offer->getDiscountPercent() ?? '',
                         'data-min' => $offer->getMinUnits() ?? '',
                         'data-max' => $offer->getMaxUnits() ?? '',
                     ];
                 },
                 'required' => false,
-            ])
-            // champ non mappé pour demander une simulation
-            ->add('simulate', CheckboxType::class, [
-                'mapped' => false,
-                'required' => false,
-                'label' => 'Faire une simulation (aucune modification en base)'
-            ])
-        ;
+            ]);
+        } else {
+            // en mode compact on peut garder une valeur d'offre non mappée pour affichage si fournie
+            if ($offerOption instanceof Offer) {
+                // ajouter un champ hidden non mappé pour conserver l'id côté client si nécessaire
+                $builder->add('selectedOffer', IntegerType::class, [
+                    'mapped' => false,
+                    'data' => $offerOption->getId(),
+                ]);
+            }
+        }
+
 
         // Validation: s'assurer qu'il y a suffisamment d'unités disponibles et respecter min/max
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($compact, $offerOption) {
             /** @var Order|null $order */
             $order = $event->getData();
             $form = $event->getForm();
@@ -93,7 +113,7 @@ class OrderType extends AbstractType
                 return;
             }
 
-            $offer = $order->getOffer();
+            $offer = $order->getOffer() ?? $offerOption;
             $quantity = $order->getQuantity();
 
             if (null === $quantity) {
@@ -105,7 +125,6 @@ class OrderType extends AbstractType
                 $min = $offer->getMinUnits();
                 if ($quantity < $min) {
                     $form->get('quantity')->addError(new FormError(sprintf('La quantité doit être au moins %d pour cette offre.', $min)));
-                    // on continue afin d'afficher toutes les erreurs éventuelles
                 }
             }
 
@@ -130,6 +149,13 @@ class OrderType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Order::class,
+            'compact' => false,
+            'offer' => null,
+            'allow_offer_select' => false,
         ]);
+
+        $resolver->setAllowedTypes('compact', 'bool');
+        $resolver->setAllowedTypes('offer', ['null', Offer::class]);
+        $resolver->setAllowedTypes('allow_offer_select', 'bool');
     }
 }

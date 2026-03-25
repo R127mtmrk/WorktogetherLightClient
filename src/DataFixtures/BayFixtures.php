@@ -25,15 +25,18 @@ class BayFixtures extends Fixture
         $stateMaintenance->setLibelleState('En maintenance');
         $manager->persist($stateMaintenance);
 
-        $bayNames = ['B01', 'B02', 'B03'];
+        // Générer 30 baies par défaut (B01..B30)
+        $nbBays = 30;
+        $unitsPerBay = 42;
 
-        foreach ($bayNames as $bayName) {
+        for ($i = 1; $i <= $nbBays; $i++) {
+            $bayName = sprintf('B%02d', $i);
             $bay = new Bay();
             $bay->setNameBay($bayName);
             $manager->persist($bay);
 
             // créer 42 unités pour chaque baie
-            for ($i = 1; $i <= 42; $i++) {
+            for ($j = 1; $j <= $unitsPerBay; $j++) {
                 $unit = new Unit();
                 $unit->setBay($bay);
                 $unit->setState($state);

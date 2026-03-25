@@ -26,7 +26,7 @@ class ChangePasswordType extends AbstractType
                 'second_options' => ['label' => 'Répéter le mot de passe'],
                 'invalid_message' => 'Les mots de passe doivent correspondre.',
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez saisir un nouveau mot de passe.']),
+                    new NotBlank(message: 'Veuillez saisir un nouveau mot de passe.'),
                 ],
             ])
         ;

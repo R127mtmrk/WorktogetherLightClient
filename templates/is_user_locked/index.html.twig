@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello IsUserLockedController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    {% if status = 'Compte bloqué' %}
+        <p>Votre compte est actuellement bloqué. Veuillez contacter le support pour plus d'informations.</p>
+        <p>Si vous pensez que c'est une erreur, vous pouvez demander un déblocage en cliquant sur le lien ci-dessous :</p>
+        <a href="{{ path('app_is_user_lockedapp_is_user_locked_reset') }}" class="btn btn-primary">Demander un déblocage</a>
+    {% else %}
+        <p>Votre compte est en bon état. Aucune action n'est nécessaire.</p>
+    {% endif %}
+
+
+</div>
+{% endblock %}
