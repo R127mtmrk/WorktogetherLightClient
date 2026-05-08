@@ -24,7 +24,7 @@ class PriceCalculator
         // appliquer réduction de l'offre si présente
         if (null !== $offer && null !== $offer->getDiscountPercent()) {
             $discountPercent = $offer->getDiscountPercent();
-            if ((float)$discountPercent > 0) {
+            if ((float) $discountPercent > 0) {
                 $multiplier = bcsub('1', bcdiv($discountPercent, '100', 4), 4);
                 $price = bcmul($base, $multiplier, 2);
             } else {
@@ -53,10 +53,10 @@ class PriceCalculator
      */
     public function calculateTotal(string $unitPrice, int $quantity, ?string $discountPercent = null): string
     {
-        $qty = (string)$quantity;
+        $qty = (string) $quantity;
         $subtotal = bcmul($unitPrice, $qty, 2);
 
-        if (null === $discountPercent || (float)$discountPercent <= 0) {
+        if (null === $discountPercent || (float) $discountPercent <= 0) {
             return $subtotal;
         }
 

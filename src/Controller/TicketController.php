@@ -20,7 +20,8 @@ final class TicketController extends AbstractController
     }
 
     #[Route('/new', name: 'app_ticket_new')]
-    public function new(): Response {
+    public function new(): Response
+    {
         // s'assurer que l'utilisateur connecté est bien un Client
         $user = $this->getUser();
         if (!($user instanceof Client)) {
@@ -28,7 +29,7 @@ final class TicketController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        $this->addFlash('error','Cette fonctionnalité n\'est pas encore implémentée. Veuillez contacter le support par email.');
+        $this->addFlash('error', 'Cette fonctionnalité n\'est pas encore implémentée. Veuillez contacter le support par email.');
         return $this->redirectToRoute('app_dashboard');
 
 

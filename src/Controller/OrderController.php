@@ -50,7 +50,7 @@ final class OrderController extends AbstractController
 
         // Pré-sélection d'une offre via ?offer={id}
         $offerId = $request->query->get('offer');
-        $preselectedOffer = $offerId ? $offerRepository->find((int)$offerId) : null;
+        $preselectedOffer = $offerId ? $offerRepository->find((int) $offerId) : null;
 
         $order = new Order();
         $order->setClient($user);
@@ -63,7 +63,7 @@ final class OrderController extends AbstractController
             }
         }
 
-        $form = $this->createForm(OrderType::class, $order, ['compact' => (bool)$preselectedOffer, 'offer' => $preselectedOffer, 'allow_offer_select' => (bool)$preselectedOffer]);
+        $form = $this->createForm(OrderType::class, $order, ['compact' => (bool) $preselectedOffer, 'offer' => $preselectedOffer, 'allow_offer_select' => (bool) $preselectedOffer]);
         $form->handleRequest($request);
 
         $availableGlobal = $unitRepository->countAvailable();
@@ -73,7 +73,7 @@ final class OrderController extends AbstractController
             $quantity = $order->getQuantity();
             if (null === $quantity || $quantity <= 0 || $availableGlobal > $quantity) {
                 $form->get('quantity')->addError(new FormError('Veuillez indiquer une quantité valide.'));
-                return $this->render('order/new.html.twig', ['form' => $form->createView(), 'available' => $availableGlobal, 'offers' => $offerRepository->findBy(['isActive' => true]), 'compact' => (bool)$preselectedOffer, 'selectedOffer' => $preselectedOffer, 'allow_offer_select' => (bool)$preselectedOffer]);
+                return $this->render('order/new.html.twig', ['form' => $form->createView(), 'available' => $availableGlobal, 'offers' => $offerRepository->findBy(['isActive' => true]), 'compact' => (bool) $preselectedOffer, 'selectedOffer' => $preselectedOffer, 'allow_offer_select' => (bool) $preselectedOffer]);
             }
         }
 
@@ -81,7 +81,7 @@ final class OrderController extends AbstractController
             $quantity = $order->getQuantity();
             if (null === $quantity || $quantity <= 0) {
                 $form->get('quantity')->addError(new FormError('Veuillez indiquer une quantité valide.'));
-                return $this->render('order/new.html.twig', ['form' => $form->createView(), 'available' => $availableGlobal, 'offers' => $offerRepository->findBy(['isActive' => true]), 'compact' => (bool)$preselectedOffer, 'selectedOffer' => $preselectedOffer, 'allow_offer_select' => (bool)$preselectedOffer]);
+                return $this->render('order/new.html.twig', ['form' => $form->createView(), 'available' => $availableGlobal, 'offers' => $offerRepository->findBy(['isActive' => true]), 'compact' => (bool) $preselectedOffer, 'selectedOffer' => $preselectedOffer, 'allow_offer_select' => (bool) $preselectedOffer]);
             }
 
             $offer = $order->getOffer() ?? $preselectedOffer;
@@ -93,11 +93,11 @@ final class OrderController extends AbstractController
                     'form' => $form->createView(),
                     'available' => $unitRepository->countAvailable($offer),
                     'offers' => $offerRepository->findBy([
-                        'isActive' => true
+                        'isActive' => true,
                     ]),
-                    'compact' => (bool)$preselectedOffer,
+                    'compact' => (bool) $preselectedOffer,
                     'selectedOffer' => $preselectedOffer,
-                    'allow_offer_select' => (bool)$preselectedOffer
+                    'allow_offer_select' => (bool) $preselectedOffer,
                 ]);
             }
 
@@ -115,9 +115,9 @@ final class OrderController extends AbstractController
                 return $this->render('order/new.html.twig', [
                     'form' => $form->createView(),
                     'available' => $unitRepository->countAvailable($offer),
-                    'compact' => (bool)$preselectedOffer,
+                    'compact' => (bool) $preselectedOffer,
                     'selectedOffer' => $preselectedOffer,
-                    'allow_offer_select' => (bool)$preselectedOffer
+                    'allow_offer_select' => (bool) $preselectedOffer,
                 ]);
             }
 
@@ -136,7 +136,7 @@ final class OrderController extends AbstractController
             ]);
         }
 
-        return $this->render('order/new.html.twig', ['form' => $form->createView(), 'available' => $availableGlobal, 'offers' => $offerRepository->findBy(['isActive' => true]), 'compact' => (bool)$preselectedOffer, 'selectedOffer' => $preselectedOffer, 'allow_offer_select' => (bool)$preselectedOffer]);
+        return $this->render('order/new.html.twig', ['form' => $form->createView(), 'available' => $availableGlobal, 'offers' => $offerRepository->findBy(['isActive' => true]), 'compact' => (bool) $preselectedOffer, 'selectedOffer' => $preselectedOffer, 'allow_offer_select' => (bool) $preselectedOffer]);
     }
 
     #[Route('/confirm', name: 'app_order_confirm', methods: ['POST'])]
@@ -175,7 +175,7 @@ final class OrderController extends AbstractController
         }
 
         $unitPrice = $calculator->calculateUnitPrice($offer, $annualPayment);
-        $total = $calculator->calculateTotal((string)$unitPrice, $quantity, $discountPercent);
+        $total = $calculator->calculateTotal((string) $unitPrice, $quantity, $discountPercent);
 
         $units = $unitRepository->findAvailable($offer, $quantity);
         $unitIds = array_map(fn($u) => $u->getId(), $units);
@@ -206,24 +206,26 @@ final class OrderController extends AbstractController
         }
 
 
-         // validation simple carte (Luhn)
-         $cardNumber = $request->request->get('card_number');
-         if (!$cardNumber || !$this->isValidCardNumber($cardNumber)) {
-             $this->addFlash('card_error', 'Numéro de carte invalide ou manquant.');
-             return $this->redirectToRoute('app_order_new');
-         }
+        // validation simple carte (Luhn)
+        $cardNumber = $request->request->get('card_number');
+        if (!$cardNumber || !$this->isValidCardNumber($cardNumber)) {
+            $this->addFlash('card_error', 'Numéro de carte invalide ou manquant.');
+            return $this->redirectToRoute('app_order_new');
+        }
 
         // Créer et persister l'ordre
         $order = new Order();
         $order->setClient($user);
-        if ($offer) $order->setOffer($offer);
+        if ($offer) {
+            $order->setOffer($offer);
+        }
         $order->setQuantity($quantity);
 
-        $calculatedUnitPrice = $calculator->calculateUnitPrice($offer, (bool)$request->request->get('annualPayment'));
+        $calculatedUnitPrice = $calculator->calculateUnitPrice($offer, (bool) $request->request->get('annualPayment'));
         $order->setUnitPrice($calculatedUnitPrice);
-        $order->setAnnualPayment((bool)$request->request->get('annualPayment'));
+        $order->setAnnualPayment((bool) $request->request->get('annualPayment'));
         $order->setDiscountPercent($request->request->get('discountPercent'));
-        $order->setTotal($calculator->calculateTotal((string)$calculatedUnitPrice, $quantity, $order->getDiscountPercent()));
+        $order->setTotal($calculator->calculateTotal((string) $calculatedUnitPrice, $quantity, $order->getDiscountPercent()));
 
         $units = $unitRepository->findAvailable($offer, $quantity);
         foreach ($units as $unit) {
@@ -251,12 +253,14 @@ final class OrderController extends AbstractController
     {
         // remove non-digits
         $num = preg_replace('/\D+/', '', $number);
-        if ('' === $num) return false;
+        if ('' === $num) {
+            return false;
+        }
 
         $sum = 0;
         $alt = false;
         for ($i = strlen($num) - 1; $i >= 0; $i--) {
-            $n = (int)$num[$i];
+            $n = (int) $num[$i];
             if ($alt) {
                 $n *= 2;
                 if ($n > 9) {

@@ -20,7 +20,7 @@ class UserFixtures extends Fixture
     {
         $user1 = new Client();
         $user1->setEmail('buisness@worktogether.com');
-        $user1->setPassword($this->hasher->hashPassword($user1,'password'));
+        $user1->setPassword($this->hasher->hashPassword($user1, 'password'));
         $user1->setRoles(['ROLE_CLIENT']);
         $user1->setIsBusiness(true);
         $user1->setPseudo('business');
@@ -29,7 +29,7 @@ class UserFixtures extends Fixture
 
         $user2 = new Client();
         $user2->setEmail('particular@worktogether.com');
-        $user2->setPassword($this->hasher->hashPassword($user2,'password'));
+        $user2->setPassword($this->hasher->hashPassword($user2, 'password'));
         $user2->setRoles(['ROLE_CLIENT']);
         $user2->setIsBusiness(false);
         $user2->setPseudo('client');

@@ -6,7 +6,4 @@ use App\Repository\StaffRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: StaffRepository::class)]
-abstract class Staff extends User
-{
-
-}
+abstract class Staff extends User {}

@@ -23,11 +23,11 @@ final class OrderApiController extends AbstractController
 
         $quantity = (int) $quantity;
         $annual = filter_var($annual, FILTER_VALIDATE_BOOLEAN);
-        $discountPercent = $discountPercent !== null ? (string)$discountPercent : null;
+        $discountPercent = $discountPercent !== null ? (string) $discountPercent : null;
 
         $offer = null;
         if ($offerId) {
-            $offer = $offerRepository->find((int)$offerId);
+            $offer = $offerRepository->find((int) $offerId);
         }
 
         $unitPrice = $calculator->calculateUnitPrice($offer, $annual);

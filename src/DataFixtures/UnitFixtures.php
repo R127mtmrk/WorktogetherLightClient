@@ -12,31 +12,31 @@ class UnitFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        // créer un état 'Disponible' si nécessaire
         $stateDisponible = new State();
         $stateDisponible->setLibelleState('Disponible');
         $manager->persist($stateDisponible);
+        $manager->flush();
+        $this->addReference('state-disponible', $stateDisponible);
 
-        // Créer 30 baies, chacune avec 42 unités libres
         $nbBays = 30;
         $unitsPerBay = 42;
 
         for ($i = 1; $i <= $nbBays; $i++) {
             $bay = new Bay();
-            $bay->setNameBay(sprintf('Baie #%d', $i));
+            $bay->setNameBay(sprintf('B#%02d', $i));
             $manager->persist($bay);
+            $manager->flush();
+            $this->addReference(sprintf('bay-%02d', $i), $bay);
 
             for ($j = 1; $j <= $unitsPerBay; $j++) {
                 $unit = new Unit();
                 $unit->setBay($bay);
                 $unit->setState($stateDisponible);
                 $unit->setIsFree(true);
-
-                // Persist unit
                 $manager->persist($unit);
             }
-        }
 
-        $manager->flush();
+            $manager->flush();
+        }
     }
 }

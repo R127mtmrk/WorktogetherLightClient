@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+
 #[Route('/islocked', name: 'app_is_user_locked')]
 final class IsUserLockedController extends AbstractController
 {
@@ -17,7 +18,7 @@ final class IsUserLockedController extends AbstractController
 
         //get pwderr from user by id in URL
         $status = $this->getUser()->getPwdErr();
-        if ($status>=3) {
+        if ($status >= 3) {
             $statusMsg = 'Compte bloqué';
         } else {
             $statusMsg = 'Compte actif';
@@ -52,5 +53,6 @@ final class IsUserLockedController extends AbstractController
             return $this->redirectToRoute('app_dashboard');
         }
 
+        return $this->render('is_user_locked/reset.html.twig', []);
     }
 }

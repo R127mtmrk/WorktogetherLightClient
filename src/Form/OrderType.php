@@ -51,7 +51,7 @@ class OrderType extends AbstractType
             ->add('discountPercent')
             ->add('total', null, [
                 'disabled' => true,
-                'label' => 'Total (calculé)'
+                'label' => 'Total (calculé)',
             ])
             ->add('paymentType', ChoiceType::class, [
                 'mapped' => false,
@@ -83,7 +83,7 @@ class OrderType extends AbstractType
                         return [];
                     }
                     return [
-                        'data-available' => (string)$this->unitRepository->countAvailable($offer),
+                        'data-available' => (string) $this->unitRepository->countAvailable($offer),
                         'data-discount' => $offer->getDiscountPercent() ?? '',
                         'data-min' => $offer->getMinUnits() ?? '',
                         'data-max' => $offer->getMaxUnits() ?? '',
